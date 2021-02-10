@@ -24,7 +24,25 @@ class UsersController {
 				res.sendStatus(401);
 				return;
 			}
-			res.sendStatus(200);
+			res.send({
+				token: user._id
+			});
+		}).catch(err => {
+			console.log(err);
+			res.sendStatus(500);
+		});
+	}
+
+	static me(req, res) {
+		User.findOne({
+			_id: req.body.token
+		}).then(user => {
+			if (!user) {
+				res.sendStatus(401);
+				return;
+			}
+			delete user.password;
+			res.send(user);
 		}).catch(err => {
 			console.log(err);
 			res.sendStatus(500);
