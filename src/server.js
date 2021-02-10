@@ -4,16 +4,16 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const routes = require('./config/routes');
+const { port, dbUrl } = require('./config/environment/index');
 
 const app = express();
-const port = 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(routes);
 
-mongoose.connect('mongodb://localhost/instagram', {
+mongoose.connect(dbUrl, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 });
