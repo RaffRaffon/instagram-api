@@ -38,6 +38,26 @@ class UsersController {
 		});
 	}
 
+	static check(req, res) {
+		const { username, email } = req.query;
+
+		if (!username && !email) {
+			res.sendStatus(400);
+			return;
+		}
+		let property = email ? 'email' : 'username';
+
+		try {
+			User.exists({
+				[property]: req.query[property]
+			}).then(isExist => {
+				res.json(isExist);
+			});
+		} catch(err) {
+			res.status(400).json(err);
+		}
+	}
+
 	static me(req, res) {
 		try {
 			const payload = jwt.verify(req.body.token, jwtSecret);
