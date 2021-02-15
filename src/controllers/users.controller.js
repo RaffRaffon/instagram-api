@@ -59,26 +59,7 @@ class UsersController {
 	}
 
 	static me(req, res) {
-		try {
-			const payload = jwt.verify(req.body.token, jwtSecret);
-			User.findById(payload._id)
-				.then(user => {
-					if (!user) {
-						res.sendStatus(401);
-						return;
-					}
-					res.send({
-						_id: user._id,
-						username: user.username,
-						email: user.email
-					});
-				}).catch(err => {
-					console.log(err);
-					res.sendStatus(500);
-				});
-		} catch(err) {
-			res.sendStatus(401);
-		}
+		res.send(req.user);
 	}
 
 }
