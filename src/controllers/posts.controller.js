@@ -9,7 +9,8 @@ class PostsController {
 		try {
 			const posts = await Post
 				.find()
-				.populate('user', ['username', 'avatar']);
+				.populate('user', ['username', 'avatar'])
+				.sort({ createdAt: req.query.sort || 1 });
 			res.send(posts);
 		} catch(err) {
 			console.log(err);

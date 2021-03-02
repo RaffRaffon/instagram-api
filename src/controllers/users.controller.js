@@ -1,6 +1,7 @@
 
 const md5 = require('md5');
 const User = require('../models/user');
+const Post = require('../models/post');
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config/environment/index');
 
@@ -60,6 +61,40 @@ class UsersController {
 
 	static me(req, res) {
 		res.send(req.user);
+	}
+
+	static async posts(req, res) {
+		const { username } = req.params;
+		try {
+			const user = await User.findOne({ username });
+			if (!user) {
+				res.sendStatus(404);
+				return;
+			}
+			const posts = await Post
+				.find({ user: user._id })
+				.populate('user', ['username', 'avatar']);
+			res.json(posts);
+		} catch (err) {
+			console.log(err);
+			res.sendStatus(500);
+		}
+	}
+
+	static async get(req, res) {
+		const { username } = req.params;
+		try {
+			const user = await User.findOne({ username });
+			if (!user) {
+				res.sendStatus(404);
+				return;
+			}
+			const { _id, avatar } = user;
+			res.json({ _id, username, avatar });
+		} catch(err) {
+			console.log(err);
+			res.sendStatus(500);
+		}
 	}
 
 }
