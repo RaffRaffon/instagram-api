@@ -97,6 +97,25 @@ class UsersController {
 		}
 	}
 
+	static async getAll(req, res) {
+		const { username } = req.query;
+		try {
+			const users = await User.find({
+				username: new RegExp(username, 'i')
+			});
+			res.json(users.map(user => ({
+				_id: user._id,
+				username: user.username,
+				avatar: user.avatar,
+				bio: user.bio,
+				createdAt: user.createdAt
+			})));
+		} catch (err) {
+			console.log(err);
+			res.sendStatus(500);
+		}
+	}
+
 }
 
 module.exports = UsersController;
