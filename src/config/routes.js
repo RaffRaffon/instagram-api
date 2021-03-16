@@ -1,4 +1,3 @@
-
 const express = require('express');
 const multer = require('multer');
 const UsersController = require('../controllers/users.controller');
@@ -15,7 +14,9 @@ routes.get('/user/:username/posts', auth, UsersController.posts);
 routes.get('/user/:username', auth, UsersController.get);
 routes.get('/user', auth, UsersController.getAll);
 
+routes.get('/post/:id/comment', auth, PostsController.getComments);
 routes.get('/post', auth, PostsController.feed);
+routes.put('/post/:id/comment', auth, PostsController.addComment);
 routes.put('/post', auth, upload.single('image'), PostsController.create);
 routes.get('/post/:id', auth, PostsController.get);
 
