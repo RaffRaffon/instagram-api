@@ -69,6 +69,8 @@ class PostsController {
 				user: userId
 			});
 			const savedComment = await comment.save();
+			await savedComment.populate('user', ['avatar', 'username'])
+				.execPopulate();
 			res.status(201).send(savedComment);
 		} catch(err) {
 			console.log(err);
