@@ -3,9 +3,11 @@ const md5 = require('md5');
 const User = require('../models/user');
 const Post = require('../models/post');
 const jwt = require('jsonwebtoken');
+const Like = require('../models/likes');
 const { jwtSecret } = require('../config/environment/index');
 
 class UsersController {
+	
 
 	static create(req, res) {
 		req.body.password = md5(req.body.password);
@@ -41,7 +43,6 @@ class UsersController {
 
 	static check(req, res) {
 		const { username, email } = req.query;
-
 		if (!username && !email) {
 			res.sendStatus(400);
 			return;
@@ -73,14 +74,34 @@ class UsersController {
 			}
 			const posts = await Post
 				.find({ user: user._id })
-				.populate('user', ['username', 'avatar']);
+				// .populate('user', ['username', 'avatar']);
 			res.json(posts);
 		} catch (err) {
 			console.log(err);
 			res.sendStatus(500);
 		}
 	}
-
+	static async getLikesLength(req,res){
+		try {
+			const likes=await Like.find({post: req.body.postId})
+			res.json(likes);
+		} catch(err){ 
+			console.log(err);
+		}
+	}
+	
+	static async getUserData(req,res){
+		try {
+			const username = req.body.username
+			console.log(username)
+			const user=await User.findOne({username: username})
+			console.log("user:",user)
+			res.json(user);
+		} catch (err) {
+			console.log(err);
+		}
+		
+	}
 	static async get(req, res) {
 		const { username } = req.params;
 		try {
@@ -115,7 +136,41 @@ class UsersController {
 			res.sendStatus(500);
 		}
 	}
-
+	static async edit(req,res){
+	let user= await User.findOne({
+			username: req.body.username,
+	})
+	
+	let doc = await User.findOneAndUpdate(
+		req.body.username, 
+		{password:md5(req.body.password),
+		email:req.body.email,
+		bio:req.body.bio});
+	console.log("user:",user)
+	console.log("doc:",doc)
+	console.log("body:",req.body)
 }
-
+	static async follow(req, res){
+		let userId=req.params.id;
+		const followerUserId = req.user._id
+		if (userId===followerUserId){
+			res.sendStatus(400)
+			return 
+		}
+		const user = await User.findOneAndUpdate(
+			userId,{$addToSet:{followers:followerUserId}},
+			{new:true}
+		);
+		if (!user){
+			res.sendStatus(404)
+			return 
+		}
+		res.send({
+			_id:user._id,
+			username:user.username,
+			followers:user.followers,
+			avatar: user.avatar
+		})
+	}
+}
 module.exports = UsersController;
