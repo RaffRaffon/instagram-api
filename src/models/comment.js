@@ -9,9 +9,11 @@ const Comment = mongoose.model('Comment', {
     content:{
         type:String
     },
-    createdAt:{
-        type: Date
-    },
+    createdAt: {
+		type: Date,
+		required: true,
+		default: () => new Date()
+	},
     user:{
         type: mongoose.ObjectId,
         ref:'User'

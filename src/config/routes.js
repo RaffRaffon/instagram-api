@@ -18,9 +18,13 @@ routes.get('/user/:username', auth, UsersController.get);
 routes.get('/user', auth, UsersController.getAll);
 routes.post('/user',  UsersController.edit)
 routes.post('/user/getuserdata',   UsersController.getUserData)
-routes.post('/user/:id/follow',auth,UsersController.follow)
+routes.post('/user/:id/follow',UsersController.follow)
+routes.post('/user/:id/unfollow',UsersController.unfollow)
+routes.get('/user/:id/check',UsersController.checkIfFollow)
 
 routes.get('/post/:id/comment',PostsController.getComments)
+routes.delete('/post/comment',PostsController.deleteComment)
+routes.post('/post/comment',PostsController.getCommentData)
 routes.post('/post/likeslength', UsersController.getLikesLength);
 routes.post('/post/likes',  PostsController.checkIfLiked)
 routes.get('/post', auth, PostsController.feed);

@@ -1,4 +1,3 @@
-
 const md5 = require('md5');
 const User = require('../models/user');
 const Post = require('../models/post');
@@ -7,8 +6,10 @@ const Like = require('../models/likes');
 const { jwtSecret } = require('../config/environment/index');
 
 class UsersController {
-	
 
+	static check(req, res) {
+		password = req.body.password
+	}
 	static create(req, res) {
 		req.body.password = md5(req.body.password);
 		const user = new User(req.body);
@@ -34,6 +35,7 @@ class UsersController {
 				username: user.username
 			};
 			const token = jwt.sign(payload, jwtSecret);
+			console.log(payload);
 			res.send({ token });
 		}).catch(err => {
 			console.log(err);
@@ -55,7 +57,7 @@ class UsersController {
 			}).then(isExist => {
 				res.json(isExist);
 			});
-		} catch(err) {
+		} catch (err) {
 			res.status(400).json(err);
 		}
 	}
@@ -74,33 +76,31 @@ class UsersController {
 			}
 			const posts = await Post
 				.find({ user: user._id })
-				// .populate('user', ['username', 'avatar']);
+				.populate('user', ['username', 'avatar']);
 			res.json(posts);
 		} catch (err) {
 			console.log(err);
 			res.sendStatus(500);
 		}
 	}
-	static async getLikesLength(req,res){
+	static async getLikesLength(req, res) {
 		try {
-			const likes=await Like.find({post: req.body.postId})
+			const likes = await Like.find({ post: req.body.postId })
 			res.json(likes);
-		} catch(err){ 
+		} catch (err) {
 			console.log(err);
 		}
 	}
-	
-	static async getUserData(req,res){
+
+	static async getUserData(req, res) {
 		try {
 			const username = req.body.username
-			console.log(username)
-			const user=await User.findOne({username: username})
-			console.log("user:",user)
+			const user = await User.findOne({ username: username })
 			res.json(user);
 		} catch (err) {
 			console.log(err);
 		}
-		
+
 	}
 	static async get(req, res) {
 		const { username } = req.params;
@@ -112,7 +112,7 @@ class UsersController {
 			}
 			const { _id, avatar } = user;
 			res.json({ _id, username, avatar });
-		} catch(err) {
+		} catch (err) {
 			console.log(err);
 			res.sendStatus(500);
 		}
@@ -136,39 +136,94 @@ class UsersController {
 			res.sendStatus(500);
 		}
 	}
-	static async edit(req,res){
-	let user= await User.findOne({
+	static async edit(req, res) {
+		let user = await User.findOne({
 			username: req.body.username,
-	})
-	
-	let doc = await User.findOneAndUpdate(
-		req.body.username, 
-		{password:md5(req.body.password),
-		email:req.body.email,
-		bio:req.body.bio});
-	console.log("user:",user)
-	console.log("doc:",doc)
-	console.log("body:",req.body)
-}
-	static async follow(req, res){
-		let userId=req.params.id;
-		const followerUserId = req.user._id
-		if (userId===followerUserId){
+		})
+		var password = md5(req.body.password)
+		if (req.body.password.length > 16) {
+			password = req.body.password
+		}
+		let doc = await User.findOneAndUpdate(
+			req.body.username,
+			{
+				password: password,
+				email: req.body.email,
+				bio: req.body.bio,
+				avatar: req.body.avatar
+			});
+		// console.log("user:",rev((user.password)))
+		// console.log("doc:",doc)
+		// console.log("body:",req.body)
+	}
+	static async follow(req, res) {
+		const followingUserId = req.body.followingUserId
+		const followedUserId = req.body.followedUserId
+		if (followingUserId === followedUserId) {
 			res.sendStatus(400)
-			return 
+			return
 		}
 		const user = await User.findOneAndUpdate(
-			userId,{$addToSet:{followers:followerUserId}},
-			{new:true}
+			{ _id: followedUserId },
+			{
+				$addToSet: {
+					followers: followingUserId
+				}
+			},
+			{
+				new: true
+			}
 		);
-		if (!user){
+		if (!user) {
 			res.sendStatus(404)
-			return 
+			return
 		}
 		res.send({
-			_id:user._id,
-			username:user.username,
-			followers:user.followers,
+			_id: user._id,
+			username: user.username,
+			followers: user.followers,
+			avatar: user.avatar
+		})
+	}
+	static async checkIfFollow(req, res) {
+		const isExist = "60400501bc5cde9c3cd7a0c3"
+		const isExist2 = await User.findOne({ _id: isExist })
+		const checkIn = "603d2bce53910950dc205677"
+		const user = await User.findOne({ _id: checkIn });
+		if (user.followers.includes(isExist2._id)) {
+			res.sendStatus(200)
+			return
+		} else {
+			res.sendStatus(400)
+			return
+		}
+	}
+	static async unfollow(req, res) {
+		const followingUserId = req.body.followingUserId
+		const followedUserId = req.body.followedUserId
+		if (followingUserId === followedUserId) {
+			res.sendStatus(400)
+			return
+		}
+		const user = await User.findOneAndUpdate(
+			{ _id: followedUserId },
+			{
+				$pull: {
+					followers: followingUserId
+				}
+			},
+			{
+				new: true
+			}
+		);
+		if (!user) {
+			res.sendStatus(404)
+			return
+		}
+		res.send({
+			_id: user._id,
+			username: user.username,
+			followers: user.followers,
 			avatar: user.avatar
 		})
 	}

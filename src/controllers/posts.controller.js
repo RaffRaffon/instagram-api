@@ -3,64 +3,73 @@ const fs = require('fs').promises; // מה זה השורה הזאת
 const Post = require('../models/post'); // מה זה השורה הזאת
 const Like = require('../models/likes');// מה זה השורה הזאת
 const Comment = require('../models/comment');
+const User = require('../models/user');
 class PostsController {
 
-	// static async addComment(req,res){
-	// 	try {
-	// 	const postId= req.params.id
-	// 	const content= req.body.content
-	// 	// const createdAt = req.body.createdAt
-	// 	const user = req.body.user
-	// 	const comment = new Comment({postId:postId, content:content,createdAt:createdAt,user:user})
-	// 	const result = await comment.save()
-	// 	res.status(201).send(result); 
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 		res.sendStatus(400);
-	// 	}
-	// }
-
-	static async getComments(req, res){
-		const postId= req.params.id
-		try{
-		const comments=await Comment.find({postId:postId})
-		.populate('user', ['username', 'avatar'])
-		res.send(comments)
-		console.log(comments)
-		} catch (err){
+	static async deleteComment(req, res) {
+		// const LoggedInUser = req.user
+		const commentId = req.body.commentId
+		// const CommentRecivedFrom = req.body.CommentRecivedFrom
+		// if (LoggedInUser === CommentRecivedFrom)
+			const result = await Comment.deleteOne({ _id: commentId });
+			res.status(201).send(result);
+	}
+	
+	static async getComments(req, res) {
+		const postId = req.params.id
+		try {
+			const comments = await Comment.find({ postId: postId })
+				.populate('user', ['username', 'avatar'])
+			res.send(comments)
+		} catch (err) {
 			console.log(err);
 			res.sendStatus(500)
 		}
 	}
-	static async addComment(req,res){
-		const postId= req.params.id
-		const {content} = req.body
+
+	static async getCommentData(req, res) {
+		const commentId = req.body.commentId
+		const result = await Comment.findOne({_id:commentId});
+		res.status(201).send(result);
+	}
+	static async addComment(req, res) {
+		const postId = req.params.id
+		const { content } = req.body
 		const userId = req.user._id
-		try{
+		try {
 			const comment = new Comment({
 				postId,
 				content,
-				user:userId
+				user: userId
 			});
 			const savedComment = await comment.save()
-			await savedComment.populate('user', ['avatar','username'])
-			.execPopulate();
+			await savedComment.populate('user', ['avatar', 'username'])
+				.execPopulate();
 			res.status(201).send(savedComment);
-		} catch (err){
+		} catch (err) {
 			console.log(err);
 			res.sendStatus(400)
 		}
 	}
 
 	static async feed(req, res) {
-
+		const { username } = req.user;
+		var newPosts = []
 		try {
+
 			const posts = await Post
 				.find()
 				.populate('like') // מה זה populate
 				.populate('user', ['username', 'avatar'])
-				.sort({ createdAt: req.query.sort || 1 }); // מה זה sort
-			res.send(posts); // מה זה res.send
+				.sort({ createdAt: req.query.sort || 1 });// מה זה sort
+			const user = await User.findOne({ username });
+			for (var post of posts) {
+				if (user.followers.includes(post.user._id)) {
+					newPosts.push(post)
+				}
+			}
+
+			res.send(newPosts); // מה זה res.send
 		} catch (err) {
 			console.log(err);
 			res.sendStatus(500);
@@ -68,35 +77,35 @@ class PostsController {
 
 	}
 	static async like(req, res) {
-	
+
 		try {
 			// console.log('user',req.user);
 			// console.log('body',req.body);
-			const like = new Like({gaveLikeTo: req.body.username,LikeRecivedFrom:req.body.LoggedInUser, post: req.body.postId})
+			const like = new Like({ gaveLikeTo: req.body.username, LikeRecivedFrom: req.body.LoggedInUser, post: req.body.postId })
 			const result = await like.save(); // onst result = await like.save();
-			res.status(201).send(result); 
+			res.status(201).send(result);
 		} catch (err) {
 			console.log(err);
 			res.sendStatus(400);
 		}
 	}
 
-	static async checkIfLiked(req,res) {
-		const like = await Like.findOne( {gaveLikeTo: req.body.gaveLikeTo,LikeRecivedFrom:req.body.LikeRecivedFrom,post:req.body.postId})
-		if (like!=null){
+	static async checkIfLiked(req, res) {
+		const like = await Like.findOne({ gaveLikeTo: req.body.gaveLikeTo, LikeRecivedFrom: req.body.LikeRecivedFrom, post: req.body.postId })
+		if (like != null) {
 			res.sendStatus(200)
 		} else {
 			res.sendStatus(401)
 		}
 	}
 	static async unlike(req, res) {
-	
+
 		try {
 			// console.log('user',req.user);
 			// console.log('body',req.body);
-			const postId=req.body.postId
-			const LikeRecivedFrom=req.body.LikeRecivedFrom
-			const result = await Like.deleteOne({post:postId,LikeRecivedFrom:LikeRecivedFrom});
+			const postId = req.body.postId
+			const LikeRecivedFrom = req.body.LikeRecivedFrom
+			const result = await Like.deleteOne({ post: postId, LikeRecivedFrom: LikeRecivedFrom });
 			res.status(201).send(result);
 		} catch (err) {
 			console.log(err);
