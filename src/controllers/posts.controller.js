@@ -64,7 +64,7 @@ class PostsController {
 				.sort({ createdAt: req.query.sort || 1 });// מה זה sort
 			const user = await User.findOne({ username });
 			for (var post of posts) {
-				if (user.followers.includes(post.user._id)) {
+				if (user.following.includes(post.user._id)) {
 					newPosts.push(post)
 				}
 			}
@@ -133,7 +133,19 @@ class PostsController {
 			res.sendStatus(400);
 		}
 	}
-
+	static async deleteComment(req, res) {
+		// const LoggedInUser = req.user
+		const commentId = req.body.commentId
+		// const CommentRecivedFrom = req.body.CommentRecivedFrom
+		// if (LoggedInUser === CommentRecivedFrom)
+			const result = await Comment.deleteOne({ _id: commentId });
+			res.status(201).send(result);
+	}
+	static async delete(req,res){
+		const PostId = req.body.PostId
+		const result = await Post.deleteOne({ _id: PostId });
+		res.status(201).send(result);
+	}
 	static async get(req, res) {
 		try {
 			const post = await Post

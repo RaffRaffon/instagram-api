@@ -20,7 +20,7 @@ routes.post('/user',  UsersController.edit)
 routes.post('/user/getuserdata',   UsersController.getUserData)
 routes.post('/user/:id/follow',UsersController.follow)
 routes.post('/user/:id/unfollow',UsersController.unfollow)
-routes.get('/user/:id/check',UsersController.checkIfFollow)
+routes.post('/user/:id/check',UsersController.checkIfFollow)
 
 routes.get('/post/:id/comment',PostsController.getComments)
 routes.delete('/post/comment',PostsController.deleteComment)
@@ -30,6 +30,7 @@ routes.post('/post/likes',  PostsController.checkIfLiked)
 routes.get('/post', auth, PostsController.feed);
 routes.post('/post/givelike', auth, PostsController.like);
 routes.delete('/post/likes', auth, PostsController.unlike);
+routes.delete('/post/delete', auth, PostsController.delete);
 
 routes.put('/post', auth, upload.single('image'), PostsController.create);
 routes.get('/post/:id', auth, PostsController.get);

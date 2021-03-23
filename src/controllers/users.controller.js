@@ -164,6 +164,17 @@ class UsersController {
 			return
 		}
 		const user = await User.findOneAndUpdate(
+			{ _id: followingUserId },
+			{
+				$addToSet: {
+					following: followedUserId
+				}
+			},
+			{
+				new: true
+			}
+		);
+		const user2 = await User.findOneAndUpdate(
 			{ _id: followedUserId },
 			{
 				$addToSet: {
@@ -186,11 +197,11 @@ class UsersController {
 		})
 	}
 	static async checkIfFollow(req, res) {
-		const isExist = "60400501bc5cde9c3cd7a0c3"
-		const isExist2 = await User.findOne({ _id: isExist })
-		const checkIn = "603d2bce53910950dc205677"
-		const user = await User.findOne({ _id: checkIn });
-		if (user.followers.includes(isExist2._id)) {
+		const followingUserId = req.body.followingUserId
+		const following = await User.findOne({ _id: followingUserId })
+		const followedUserId = req.body.followedUserId
+		const followed = await User.findOne({ _id: followedUserId });
+		if (following.following.includes(followed._id)) {
 			res.sendStatus(200)
 			return
 		} else {
@@ -206,6 +217,17 @@ class UsersController {
 			return
 		}
 		const user = await User.findOneAndUpdate(
+			{ _id: followingUserId },
+			{
+				$pull: {
+					following: followedUserId
+				}
+			},
+			{
+				new: true
+			}
+		);
+		const user2 = await User.findOneAndUpdate(
 			{ _id: followedUserId },
 			{
 				$pull: {
