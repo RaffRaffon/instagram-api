@@ -8,9 +8,7 @@ const { jwtSecret } = require('../config/environment/index');
 
 class UsersController {
 
-	static check(req, res) {
-		password = req.body.password
-	}
+	
 	static create(req, res) {
 		req.body.password = md5(req.body.password);
 		const user = new User(req.body);
