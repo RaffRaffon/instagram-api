@@ -42,24 +42,52 @@ class UsersController {
 		});
 	}
 
-	static check(req, res) {
+	// static check(req, res) {
+	// 	const { username, email } = req.query;
+	// 	if (!username && !email) {
+	// 		res.sendStatus(400);
+	// 		return;
+	// 	}
+	// 	let property = email ? 'email' : 'username';
+
+	// 	try {
+	// 		User.exists({
+	// 			[property]: req.query[property]
+	// 		}).then(isExist => {
+	// 			res.json(isExist);
+	// 		});
+	// 	} catch (err) {
+	// 		res.status(400).json(err);
+	// 	}
+	// }
+
+	 static async check(req, res) {
 		const { username, email } = req.query;
 		if (!username && !email) {
 			res.sendStatus(400);
 			return;
 		}
-		let property = email ? 'email' : 'username';
-
 		try {
-			User.exists({
-				[property]: req.query[property]
-			}).then(isExist => {
-				res.json(isExist);
-			});
-		} catch (err) {
-			res.status(400).json(err);
+			if (!email){
+				const user = await User.findOne({ username})
+				if (!user) {
+					res.send(false)
+				} else {
+					res.send(true)
+				}
+			}
+			if (!username){
+				const user = await User.findOne({ email})
+			if (!user) {
+				res.send(false)
+			} else {
+				res.send(true)
+			}
 		}
+	} catch (err) {
+		res.status(400).json(err);
 	}
+}
 
 	static me(req, res) {
 		res.send(req.user);
