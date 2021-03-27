@@ -4,6 +4,7 @@ const Post = require('../models/post'); // מה זה השורה הזאת
 const Like = require('../models/likes');// מה זה השורה הזאת
 const Comment = require('../models/comment');
 const User = require('../models/user');
+
 class PostsController {
 
 	static async deleteComment(req, res) {
@@ -174,6 +175,39 @@ class PostsController {
 			}
 			res.json(post);
 		} catch (err) {
+			console.log(err);
+			res.sendStatus(500);
+		}
+	}
+
+	static async addComment(req, res) {
+		const postId = req.params.id;
+		const { content } = req.body;
+		const userId = req.user._id;
+
+		try {
+			const comment = new Comment({
+				postId,
+				content,
+				user: userId
+			});
+			const savedComment = await comment.save();
+			await savedComment.populate('user', ['avatar', 'username'])
+				.execPopulate();
+			res.status(201).send(savedComment);
+		} catch(err) {
+			console.log(err);
+			res.sendStatus(400);
+		}
+	}
+
+	static async getComments(req, res) {
+		const postId = req.params.id;
+		try {
+			const comments = await Comment.find({ postId })
+				.populate('user', ['username', 'avatar']);
+			res.send(comments);
+		} catch(err) {
 			console.log(err);
 			res.sendStatus(500);
 		}
