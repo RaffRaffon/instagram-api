@@ -18,10 +18,12 @@ routes.get('/user/:username', auth, UsersController.get);
 routes.get('/user', auth, UsersController.getAll);
 routes.post('/user',  UsersController.edit)
 routes.post('/user/getuserdata',   UsersController.getUserData)
+routes.post('/user/getuserdatabyid',UsersController.getUserDataById)
 routes.post('/user/:id/follow',UsersController.follow)
 routes.post('/user/:id/unfollow',UsersController.unfollow)
 routes.post('/user/:id/check',UsersController.checkIfFollow)
 
+routes.get('/post/explorefeed', auth, PostsController.exploreFeed);
 routes.get('/post/:id/comment',PostsController.getComments)
 routes.delete('/post/comment',PostsController.deleteComment)
 routes.post('/post/comment',PostsController.getCommentData)

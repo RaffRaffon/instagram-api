@@ -102,6 +102,16 @@ class UsersController {
 		}
 
 	}
+	static async getUserDataById(req, res) {
+		try {
+			const username = req.body.userId
+			const user = await User.findOne({ _id: username })
+			res.json(user);
+		} catch (err) {
+			console.log(err);
+		}
+
+	}
 	static async get(req, res) {
 		const { username } = req.params;
 		try {

@@ -76,6 +76,23 @@ class PostsController {
 		}
 
 	}
+	static async exploreFeed(req, res) {
+		try {
+
+			const posts = await Post
+				.find()
+				.populate('like') // מה זה populate
+				.populate('user', ['username', 'avatar'])
+				.sort({ createdAt: req.query.sort || 1 });// מה זה sort
+			
+
+			res.send(posts); // מה זה res.send
+		} catch (err) {
+			console.log(err);
+			res.sendStatus(500);
+		}
+
+	}
 	static async like(req, res) {
 
 		try {
