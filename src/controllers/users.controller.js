@@ -91,7 +91,11 @@ class UsersController {
 // }
 	 static async checkEmail(req, res) {
 		const email=req.body.email
-		console.log(email)
+		const currentLoggedInEmail=req.body.currentLoggedInEmail
+		if (email===currentLoggedInEmail){
+			res.send(true)
+			return
+		}
 		const user = await User.findOne({ email})
 		if (!user){
 			res.send(true)
@@ -101,7 +105,11 @@ class UsersController {
 	}
 	static async checkUsername(req, res) {
 		const username=req.body.username
-		console.log(username)
+		const LoggedInUsername= req.body.loggedInUser
+		if (username===LoggedInUsername){
+			res.send(true)
+			return
+		}
 		const user = await User.findOne({ username})
 		if (!user){
 			res.send(true)
@@ -162,6 +170,7 @@ class UsersController {
 	}
 	static async get(req, res) {
 		const { username } = req.params;
+		console.log(req.params)
 		try {
 			const user = await User.findOne({ username });
 			if (!user) {
@@ -195,15 +204,12 @@ class UsersController {
 		}
 	}
 	static async edit(req, res) {
-		let user = await User.findOne({
-			username: req.body.username,
-		})
 		var password = md5(req.body.password)
 		if (req.body.password.length > 16) {
 			password = req.body.password
 		}
 		let doc = await User.findOneAndUpdate(
-			req.body.username,
+			{username:req.body.username},
 			{
 				password: password,
 				email: req.body.email,
