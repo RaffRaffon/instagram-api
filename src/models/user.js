@@ -6,6 +6,9 @@ const User = mongoose.model('User', {
 		type: String,
 		required: true
 	},
+	prevUsername:{
+		type: String
+	},
 	password: {
 		type: String,
 		required: true

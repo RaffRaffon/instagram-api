@@ -209,8 +209,11 @@ class UsersController {
 			password = req.body.password
 		}
 		let doc = await User.findOneAndUpdate(
-			{username:req.body.username},
+			{username:req.body.currentUser},
 			{
+
+				username: req.body.username,
+				prevUsername:req.body.currentUser,
 				password: password,
 				email: req.body.email,
 				bio: req.body.bio,
