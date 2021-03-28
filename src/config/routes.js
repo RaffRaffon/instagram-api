@@ -12,7 +12,7 @@ const upload = multer({ dest: 'public/posts' });
 routes.put('/user', UsersController.create);
 routes.post('/user/login', UsersController.login);
 routes.post('/user/me', auth, UsersController.me);
-routes.get('/user/check', UsersController.check);
+// routes.get('/user/check', UsersController.check);
 routes.post('/user/:id/follow', auth, UsersController.follow);
 routes.get('/user/:username/posts', auth, UsersController.posts);
 routes.get('/user/:username', auth, UsersController.get);
