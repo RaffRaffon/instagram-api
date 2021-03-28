@@ -23,6 +23,8 @@ routes.post('/user/getuserdatabyid',UsersController.getUserDataById)
 routes.post('/user/:id/follow',UsersController.follow)
 routes.post('/user/:id/unfollow',UsersController.unfollow)
 routes.post('/user/:id/check',UsersController.checkIfFollow)
+routes.post('/user/checkemail', UsersController.checkEmail)
+routes.post('/user/checkusername', UsersController.checkUsername)
 
 routes.get('/post/explorefeed', auth, PostsController.exploreFeed);
 routes.get('/post/:id/comment',PostsController.getComments)

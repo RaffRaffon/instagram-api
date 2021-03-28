@@ -61,33 +61,54 @@ class UsersController {
 	// 	}
 	// }
 
-	 static async check(req, res) {
-		const { username, email } = req.query;
-		if (!username && !email) {
-			res.sendStatus(400);
-			return;
+// 	 static async check(req, res) {
+// 		const { username, email } = req.query;
+// 		console.log(username,email);
+// 		if (!username && !email) {
+// 			res.sendStatus(400);
+// 			return;
+// 		}
+// 		try {
+// 			if (!email){
+// 				const user = await User.findOne({ username})
+// 				if (!user) {
+// 					res.send(false)
+// 				} else {
+// 					res.send(true)
+// 				}
+// 			}
+// 			if (!username){
+// 				const user = await User.findOne({ email})
+// 			if (!user) {
+// 				res.send(false)
+// 			} else {
+// 				res.send(true)
+// 			}
+// 		}
+// 	} catch (err) {
+// 		res.status(400).json(err);
+// 	}
+// }
+	 static async checkEmail(req, res) {
+		const email=req.body.email
+		console.log(email)
+		const user = await User.findOne({ email})
+		if (!user){
+			res.send(true)
+		} else {
+			res.send(false)
 		}
-		try {
-			if (!email){
-				const user = await User.findOne({ username})
-				if (!user) {
-					res.send(false)
-				} else {
-					res.send(true)
-				}
-			}
-			if (!username){
-				const user = await User.findOne({ email})
-			if (!user) {
-				res.send(false)
-			} else {
-				res.send(true)
-			}
-		}
-	} catch (err) {
-		res.status(400).json(err);
 	}
-}
+	static async checkUsername(req, res) {
+		const username=req.body.username
+		console.log(username)
+		const user = await User.findOne({ username})
+		if (!user){
+			res.send(true)
+		} else {
+			res.send(false)
+		}
+	}
 
 	static me(req, res) {
 		res.send(req.user);
