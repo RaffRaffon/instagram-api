@@ -15,7 +15,15 @@ class PostsController {
 			const result = await Comment.deleteOne({ _id: commentId });
 			res.status(201).send(result);
 	}
-	
+	static async editPost(req,res){
+		const description=req.body.description
+		const postId = req.body.postId
+		const post = await Post.findOneAndUpdate(
+			{_id:postId},
+			{description:description})
+			res.sendStatus(200)
+	}
+
 	static async getComments(req, res) {
 		const postId = req.params.id
 		try {

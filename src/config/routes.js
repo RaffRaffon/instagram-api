@@ -27,6 +27,7 @@ routes.post('/user/:id/check',UsersController.checkIfFollow)
 routes.post('/user/checkemail', UsersController.checkEmail)
 routes.post('/user/checkusername', UsersController.checkUsername)
 
+routes.post('/postedit',PostsController.editPost)
 routes.get('/post/explorefeed', auth, PostsController.exploreFeed);
 routes.get('/post/:id/comment',PostsController.getComments)
 routes.delete('/post/comment',PostsController.deleteComment)
