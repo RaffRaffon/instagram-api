@@ -41,6 +41,27 @@ class UsersController {
 			res.sendStatus(500);
 		});
 	}
+	static editLogin(req, res) {
+		User.findOne({
+			username: req.body.username,
+			password: req.body.password
+		}).then(user => {
+			if (!user) {
+				res.sendStatus(401);
+				return;
+			}
+			const payload = {
+				_id: user._id,
+				username: user.username
+			};
+			const token = jwt.sign(payload, jwtSecret);
+			console.log(payload);
+			res.send({ token });
+		}).catch(err => {
+			console.log(err);
+			res.sendStatus(500);
+		});
+	}
 
 	// static check(req, res) {
 	// 	const { username, email } = req.query;
