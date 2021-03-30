@@ -118,6 +118,7 @@ class PostsController {
 
 	static async checkIfLiked(req, res) {
 		const like = await Like.findOne({ gaveLikeTo: req.body.gaveLikeTo, LikeRecivedFrom: req.body.LikeRecivedFrom, post: req.body.postId })
+		console.log(req.body.gaveLikeTo, req.body.LikeRecivedFrom, req.body.postId)
 		if (like != null) {
 			res.sendStatus(200)
 		} else {
